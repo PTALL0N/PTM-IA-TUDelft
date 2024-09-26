@@ -51,13 +51,45 @@ class VanillaCNN(nn.Module):
 
     def __init__(self, channel_in, channel_out, last_layer_bias=True):
         super().__init__()
-        # TODO: Implement the model architecture
-        self.dummy_param = nn.Parameter(torch.empty(1))
-        pass
+        self.channel_in = channel_in
+        self.channel_out = channel_out
+        self.conv1 = nn.Conv2d(
+            in_channels=channel_in, out_channels=16, kernel_size=3, stride=1
+        )
+        self.act1 = nn.ReLU()
+        self.maxpooling1 = nn.MaxPool2d(kernel_size=2)
+        self.conv2 = nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, stride=1)
+        self.act2 = nn.ReLU()
+        self.maxpooling2 = nn.MaxPool2d(kernel_size=2)
+        self.conv3 = nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, stride=1)
+        self.act3 = nn.ReLU()
+        self.maxpooling3 = nn.MaxPool2d(kernel_size=2)
+        self.linear4 = nn.LazyLinear(out_features=128)
+        self.act4 = nn.ReLU()
+        self.linear5 = nn.Linear(in_features=128, out_features=64)
+        self.act5 = nn.ReLU()
+        self.linear6 = nn.Linear(64, channel_out, bias=last_layer_bias)
 
     def forward(self, x):
-        # TODO: Implement the forward pass
-        pass
+        tmp = self.conv1(x)
+        tmp = self.act1(tmp)
+        tmp = self.maxpooling1(tmp)
+        tmp = self.conv2(tmp)
+        tmp = self.act2(tmp)
+        tmp = self.maxpooling2(tmp)
+        tmp = self.conv3(tmp)
+        tmp = self.act3(tmp)
+        tmp = self.maxpooling3(tmp)
+        tmp = torch.flatten(
+            tmp, start_dim=1
+        )  # Flatten from the second dimension onwards
+        tmp = self.linear4(tmp)
+        tmp = self.act4(tmp)
+        tmp = self.linear5(tmp)
+        tmp = self.act5(tmp)
+        angle_vect = self.linear6(tmp)
+
+        return angle_vect
 
 
 def get_representation_layer(representation):
@@ -74,7 +106,10 @@ def get_representation_layer(representation):
 
             def forward(self, x):
                 # TODO: Implement the conversion from polarized intensity to IQU
-                pass
+                I = 0.5 * x[0].sum(axis=0)
+                Q = x[0][0] - x[0][2]
+                U = x[0][1] - x[0][3]
+                return I, Q, U
 
         representation_layer = PolCh2IQU()
     elif representation == "DOP+AOP":
@@ -86,7 +121,12 @@ def get_representation_layer(representation):
 
             def forward(self, x):
                 # TODO: Implement the conversion from polarized intensity to DOP and AOP
-                pass
+                I = 0.5 * x[0].sum(axis=0)
+                Q = x[0][0] - x[0][2]
+                U = x[0][1] - x[0][3]
+                DOP = (Q**2 + U**2) ** 0.5 / I
+                AOP = 0.5 * torch.arctan2(U, Q)
+                return DOP, AOP
 
         representation_layer = PolCh2DOPAOP()
     elif representation == "IQU+DOP+AOP":
@@ -98,7 +138,12 @@ def get_representation_layer(representation):
 
             def forward(self, x):
                 # TODO: Implement the conversion from polarized intensity to IQU, DOP and AOP
-                pass
+                I = 0.5 * x[0].sum(axis=0)
+                Q = x[0][0] - x[0][2]
+                U = x[0][1] - x[0][3]
+                DOP = (Q**2 + U**2) ** 0.5 / I
+                AOP = 0.5 * torch.arctan2(U, Q)
+                return DOP, AOP, I, Q, U
 
         representation_layer = PolCh2IQUDOPAOP()
 

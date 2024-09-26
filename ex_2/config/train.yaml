@@ -1,4 +1,4 @@
-epochs: 50
+epochs: 3
 
 demo:
   param_group_1:
@@ -26,7 +26,7 @@ optimizer:
 defaults:
   - _self_
   - dataset: real_dataset
-  - model/backbone: vanilla # resnet, vanilla
+  - model/backbone: resnet # resnet, vanilla
   - model/representation: raw # raw, IQU, DOP+AOP, IQU+DOP+AOP
   - model/readout: angle # angle, vector
   # use mse loss when readout as angle, use l_norm loss when readout as vector
