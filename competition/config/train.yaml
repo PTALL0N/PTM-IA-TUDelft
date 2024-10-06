@@ -1,0 +1,25 @@
+epochs: 20
+
+dataloader:
+  _target_: torch.utils.data.DataLoader
+  _partial_: true
+  batch_size: 32
+  shuffle: true
+  num_workers: 0
+
+model:
+  _target_: model.GateCornerCNN
+
+optimizer:
+  _target_: torch.optim.Adam
+  _partial_: true
+  lr: 0.001
+
+# Loss function configuration
+loss:
+  _target_: torch.nn.MSELoss  # Example using MSE Loss
+
+defaults:
+  - _self_
+  - dataset: dataset
+  
