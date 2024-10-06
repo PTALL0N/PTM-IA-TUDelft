@@ -1,0 +1,4 @@
+dataset:
+  _target_: dataset.DroneDataset
+  dir_dataset: /workspaces/AE4353-Y24/data/AutonomousFlightData/test
+
