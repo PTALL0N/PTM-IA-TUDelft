@@ -1,0 +1,8 @@
+# Train/val/test sets
+path: /kaggle/working/dataset # dataset root dir
+train: images # train images
+val: images # val images
+
+# Classes
+names:
+    0: gate
